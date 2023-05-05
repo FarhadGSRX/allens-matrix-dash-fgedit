@@ -12,8 +12,11 @@ class SpotifyScreen:
 
         self.font = ImageFont.truetype("fonts/tiny.otf", 5)
         
-        self.canvas_width = config.getint('System', 'canvas_width', fallback=64)
-        self.canvas_height = config.getint('System', 'canvas_height', fallback=32)
+        # self.canvas_width = config.getint('System', 'canvas_width', fallback=64)
+        # self.canvas_height = config.getint('System', 'canvas_height', fallback=32)
+        self.canvas_width = config.getint('Spotify-Size', 'width', fallback=64)
+        self.canvas_height = config.getint('Spotify-Size', 'height', fallback=32)
+        
         self.title_color = literal_eval(config.get('Spotify Player', 'title_color',fallback="(255,255,255)"))
         self.artist_color = literal_eval(config.get('Spotify Player', 'artist_color',fallback="(255,255,255)"))
         self.play_color = literal_eval(config.get('Spotify Player', 'play_color',fallback="(255,255,255)"))

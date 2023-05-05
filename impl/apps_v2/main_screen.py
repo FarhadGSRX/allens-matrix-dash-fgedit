@@ -122,20 +122,20 @@ class MainScreen:
                 draw.text((33, 6), padToTwoDigit(curr_temp), white, font=self.font)
                 draw.point((41,6), fill=white)
         
-        #notifications
-        noti_list = self.modules['notifications'].getNotificationList()
-        counts = countList(noti_list)
+        #notifications  # TODO: Return to fix these notifications
+        # noti_list = self.modules['notifications'].getNotificationList()
+        # counts = countList(noti_list)
 
-        if (counts['Discord'] > 0):
-            draw.rectangle((37,26,38,27), fill=discordColor)
-        if (counts['SMS'] > 0):
-            draw.rectangle((34,26,35,27), fill=smsColor)
-        if (counts['Snapchat'] > 0):
-            draw.rectangle((34,29,35,30), fill=snapchatColor)
-        if (counts['Messenger'] > 0):
-            draw.rectangle((37,29,38,30), fill=messengerColor)
+        # if (counts['Discord'] > 0):
+        #     draw.rectangle((37,26,38,27), fill=discordColor)
+        # if (counts['SMS'] > 0):
+        #     draw.rectangle((34,26,35,27), fill=smsColor)
+        # if (counts['Snapchat'] > 0):
+        #     draw.rectangle((34,29,35,30), fill=snapchatColor)
+        # if (counts['Messenger'] > 0):
+        #     draw.rectangle((37,29,38,30), fill=messengerColor)
         
-        self.old_noti_list = noti_list
+        # self.old_noti_list = noti_list
         
         return frame
     

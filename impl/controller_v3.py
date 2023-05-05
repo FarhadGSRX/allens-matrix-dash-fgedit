@@ -1,10 +1,10 @@
 import queue
 import sys, os, time, copy, inspect
 from InputStatus import InputStatusEnum
-from gpiozero import Button, RotaryEncoder
+# from gpiozero import Button, RotaryEncoder
 import configparser
 from PIL import Image
-
+Image.re
 import select
 
 from apps_v2 import main_screen, notion_v2, subcount, gif_viewer, weather, life, spotify_player
@@ -15,11 +15,15 @@ enc_A = 5
 enc_B = 6
 tilt = 19
 
+using_emulator = False
+# os.chdir(r"G:\My Drive\_fg\Works\Coding - Projects\allens-matrix-dash-fgedit")
+
 def main():
     brightness = 100
     displayOn = True
 
     config = configparser.ConfigParser()
+    print(os.getcwd())
     parsed_configs = config.read('../config.ini')
     if len(parsed_configs) == 0:
         print("no config file found")
@@ -28,22 +32,23 @@ def main():
     canvas_width = config.getint('System', 'canvas_width', fallback=64)
     canvas_height = config.getint('System', 'canvas_height', fallback=32)
 
-    black_screen = Image.new("RGB", (canvas_width, canvas_height), (0,0,0))
+    # black_screen = Image.new("RGB", (canvas_width, canvas_height), (0,0,0))
+    black_screen = Image.new("RGB", (192, 96), (0,0,0))
 
-    encButton = Button(sw, pull_up = True)
+    # encButton = Button(sw, pull_up = True)
     inputStatusDict = {"value" : InputStatusEnum.NOTHING}
-    encButton.when_pressed = lambda button : encButtonFunc(button, inputStatusDict)
+    # encButton.when_pressed = lambda button : encButtonFunc(button, inputStatusDict)
 
     encoderQueue = queue.Queue()
-    encoder = RotaryEncoder(enc_A, enc_B)
-    encoder.when_rotated_clockwise = lambda enc : rotate_clockwise(enc, encoderQueue)
-    encoder.when_rotated_counter_clockwise = lambda enc : rotate_counter_clockwise(enc, encoderQueue)
+    # encoder = RotaryEncoder(enc_A, enc_B)
+    # encoder.when_rotated_clockwise = lambda enc : rotate_clockwise(enc, encoderQueue)
+    # encoder.when_rotated_counter_clockwise = lambda enc : rotate_counter_clockwise(enc, encoderQueue)
     encoder_state = 0
 
-    tilt_switch = Button(tilt, pull_up = True)
+    # tilt_switch = Button(tilt, pull_up = True)
     isHorizontalDict = {'value': True}
-    tilt_switch.when_pressed = lambda button : tilt_callback(button, isHorizontalDict)
-    tilt_switch.when_released = lambda button : tilt_callback(button, isHorizontalDict)
+    # tilt_switch.when_pressed = lambda button : tilt_callback(button, isHorizontalDict)
+    # tilt_switch.when_released = lambda button : tilt_callback(button, isHorizontalDict)
 
     def toggle_display():
         nonlocal displayOn
@@ -77,30 +82,38 @@ def main():
     
     modules =   {
                     'weather' : weather_module.WeatherModule(config),
-                    'notifications' : notification_module.NotificationModule(config),
+                    # 'notifications' : notification_module.NotificationModule(config),
                     'spotify' : spotify_module.SpotifyModule(config)
                 }
 
     app_list = [main_screen.MainScreen(config, modules, callbacks),
                 notion_v2.NotionScreen(config, modules, callbacks),
                 weather.WeatherScreen(config, modules, callbacks),
-                subcount.SubcountScreen(config, modules, callbacks),
-                gif_viewer.GifScreen(config, modules, callbacks),
-                life.GameOfLifeScreen(config, modules, callbacks),
+                # subcount.SubcountScreen(config, modules, callbacks),
+                # gif_viewer.GifScreen(config, modules, callbacks),
+                # life.GameOfLifeScreen(config, modules, callbacks),
                 spotify_player.SpotifyScreen(config, modules, callbacks)]
 
     currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir+"/rpi-rgb-led-matrix/bindings/python")
-    from rgbmatrix import RGBMatrix, RGBMatrixOptions
+    print("Current Dir: ", currentdir)
+    print("Parent Dir: ", parentdir)
+
+    if using_emulator:
+        print(parentdir+"/RGBMatrixEmulator/RGBMatrixEmulator")      
+        sys.path.append(parentdir+"/RGBMatrixEmulator")
+        from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
+    else:
+        sys.path.append(parentdir+"/rpi-rgb-led-matrix/bindings/python")
+        from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
     options = RGBMatrixOptions()
     options.rows = 32
     options.cols = 64
-    options.chain_length = 1
-    options.parallel = 1
+    options.chain_length = 3
+    options.parallel = 3
     options.brightness = brightness
-    options.pixel_mapper_config = "U-mapper;Rotate:180"
+    options.pixel_mapper_config = ""
     options.gpio_slowdown = 1
     options.pwm_lsb_nanoseconds = 80
     options.limit_refresh_rate_hz = 150
@@ -125,29 +138,42 @@ def main():
 
         isHorizontalSnapshot = copy.copy(isHorizontalDict['value'])
 
-        while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-            cmd = sys.stdin.readline()
-            if cmd:
-                print("detected: " + cmd)
-                if cmd == 'SP\n':
-                    inputStatusSnapshot = InputStatusEnum.SINGLE_PRESS
-                elif cmd == 'DP\n':
-                    inputStatusSnapshot = InputStatusEnum.DOUBLE_PRESS
-                elif cmd == 'TP\n':
-                    inputStatusSnapshot = InputStatusEnum.TRIPLE_PRESS
-                elif cmd == 'LP\n':
-                    inputStatusSnapshot = InputStatusEnum.LONG_PRESS
-                elif cmd == 'EI\n':
-                    inputStatusSnapshot = InputStatusEnum.ENCODER_INCREASE
-                elif cmd == 'ED\n':
-                    inputStatusSnapshot = InputStatusEnum.ENCODER_DECREASE
+        # while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        #     cmd = sys.stdin.readline()
+        #     if cmd:
+        #         print("detected: " + cmd)
+        #         if cmd == 'SP\n':
+        #             inputStatusSnapshot = InputStatusEnum.SINGLE_PRESS
+        #         elif cmd == 'DP\n':
+        #             inputStatusSnapshot = InputStatusEnum.DOUBLE_PRESS
+        #         elif cmd == 'TP\n':
+        #             inputStatusSnapshot = InputStatusEnum.TRIPLE_PRESS
+        #         elif cmd == 'LP\n':
+        #             inputStatusSnapshot = InputStatusEnum.LONG_PRESS
+        #         elif cmd == 'EI\n':
+        #             inputStatusSnapshot = InputStatusEnum.ENCODER_INCREASE
+        #         elif cmd == 'ED\n':
+        #             inputStatusSnapshot = InputStatusEnum.ENCODER_DECREASE
 
-        frame = app_list[current_app_idx % len(app_list)].generate(isHorizontalSnapshot, inputStatusSnapshot)
-        if not displayOn:
-            frame = black_screen
+        # if int(time.time()) % 10 == 0:
+        #     current_app_idx += 1
+        #     time.sleep(1)
+        # if current_app_idx > len(app_list) - 1:
+        #     current_app_idx = 0
+
+        full_frame = black_screen
+        full_frame.paste(app_list[0].generate(isHorizontalSnapshot, inputStatusSnapshot).resize((96, 48)))
+        full_frame.paste(app_list[1].generate(isHorizontalSnapshot, inputStatusSnapshot), (96, 0))
+        full_frame.paste(app_list[2].generate(isHorizontalSnapshot, inputStatusSnapshot).resize((48, 48)), (0, 48))
+        full_frame.paste(app_list[3].generate(isHorizontalSnapshot, inputStatusSnapshot), (48, 48))
+        
+        # full_frame.show()
+        # frame = app_list[current_app_idx % len(app_list)].generate(isHorizontalSnapshot, inputStatusSnapshot)
+        # if not displayOn:
+        #   frame = black_screen
         
         #matrix.brightness = 100
-        matrix.SetImage(frame)
+        matrix.SetImage(full_frame)
         time.sleep(0.05)
 
 def encButtonFunc(enc_button, inputStatusDict):
